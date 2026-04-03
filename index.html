@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student Grade Calculator</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+<div class="card">
+
+  <div class="header">
+    <div class="badge"><span class="dot"></span>Academic Tool</div>
+    <h1>Grade <span>Calculator</span></h1>
+    <p>Enter marks to compute results instantly</p>
+  </div>
+
+  <!-- Student Info -->
+  <div class="section-label">Student Info</div>
+
+  <div class="field">
+    <label>Student Name</label>
+    <input type="text" id="studentName" placeholder="e.g. Arjun Sharma" autocomplete="off"/>
+    <span class="error-msg" id="nameErr">Please enter student name.</span>
+  </div>
+
+  <div class="field">
+    <label>Roll Number</label>
+    <input type="text" id="rollNo" placeholder="e.g. 2024CS042" autocomplete="off"/>
+    <span class="error-msg" id="rollErr">Please enter roll number.</span>
+  </div>
+
+  <!-- Subjects -->
+  <div class="section-label">Subject Marks <span class="max-note">/ 100 each</span></div>
+
+  <div class="subjects-grid">
+    <div class="field">
+      <label>Subject 1</label>
+      <input type="number" id="s1" placeholder="0 – 100" min="0" max="100"/>
+      <span class="error-msg" id="s1Err">0–100 only.</span>
+    </div>
+    <div class="field">
+      <label>Subject 2</label>
+      <input type="number" id="s2" placeholder="0 – 100" min="0" max="100"/>
+      <span class="error-msg" id="s2Err">0–100 only.</span>
+    </div>
+    <div class="field">
+      <label>Subject 3</label>
+      <input type="number" id="s3" placeholder="0 – 100" min="0" max="100"/>
+      <span class="error-msg" id="s3Err">0–100 only.</span>
+    </div>
+    <div class="field">
+      <label>Subject 4</label>
+      <input type="number" id="s4" placeholder="0 – 100" min="0" max="100"/>
+      <span class="error-msg" id="s4Err">0–100 only.</span>
+    </div>
+    <div class="field">
+      <label>Subject 5</label>
+      <input type="number" id="s5" placeholder="0 – 100" min="0" max="100"/>
+      <span class="error-msg" id="s5Err">0–100 only.</span>
+    </div>
+  </div>
+
+  <!-- Buttons -->
+  <div class="btn-row">
+    <button class="btn btn-calc" onclick="calculate()">⚡ Calculate</button>
+    <button class="btn btn-reset" onclick="resetForm()">↺ Reset</button>
+  </div>
+
+  <!-- Result -->
+  <div class="result-wrap" id="resultWrap">
+    <div class="result-card">
+      <div class="result-header">
+        <span class="r-icon">📊</span>
+        <h3>Result Summary</h3>
+      </div>
+      <div class="result-body">
+        <div class="stats-row">
+          <div class="stat">
+            <span class="s-label">Total</span>
+            <span class="s-value" id="rTotal">—</span>
+          </div>
+          <div class="stat">
+            <span class="s-label">Percentage</span>
+            <span class="s-value" id="rPercent">—</span>
+          </div>
+          <div class="stat">
+            <span class="s-label">Max</span>
+            <span class="s-value">500</span>
+          </div>
+        </div>
+        <div class="grade-display">
+          <div class="grade-circle" id="gradeCircle">—</div>
+          <div class="grade-info">
+            <div class="g-title" id="gradeTitle">—</div>
+            <div class="g-desc" id="gradeDesc">—</div>
+            <div class="g-student" id="gradeStudent">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- All Records Table -->
+  <div class="records-wrap" id="recordsWrap">
+    <div class="section-label" style="margin-top:1.8rem;">All Student Records</div>
+    <div class="table-scroll">
+      <table id="recordsTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Roll No</th>
+            <th>Total</th>
+            <th>%</th>
+            <th>Grade</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="recordsBody"></tbody>
+      </table>
+    </div>
+    <button class="btn btn-clear" onclick="clearAllRecords()">🗑 Clear All Records</button>
+  </div>
+
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>

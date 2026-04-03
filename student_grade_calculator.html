@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student Grade Calculator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:          #0a0c10;
+      --surface:     #111318;
+      --card:        #161b24;
+      --border:      #1f2733;
+      --border-glow: #2a7cff44;
+      --accent:      #2a7cff;
+      --accent2:     #00e5c3;
+      --text:        #e8edf5;
+      --muted:       #6b7a8d;
+      --danger:      #ff4d6a;
+      --warn:        #ffb830;
+      --success:     #00e5c3;
+      --radius:      14px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'DM Mono', monospace;
+      padding: 2rem 1rem;
+      background-image:
+        radial-gradient(ellipse 80% 60% at 50% -20%, #1a2a4a55, transparent),
+        radial-gradient(ellipse 50% 40% at 80% 110%, #0d2a2044, transparent);
+    }
+
+    .card {
+      width: 100%;
+      max-width: 440px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 2.4rem 2rem 2rem;
+      box-shadow:
+        0 0 0 1px #ffffff06,
+        0 30px 80px #00000088,
+        0 0 60px #2a7cff12;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* subtle top glow bar */
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 10%; right: 10%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), var(--accent2), transparent);
+      opacity: .6;
+    }
+
+    /* ── Header ── */
+    .header { text-align: center; margin-bottom: 2rem; }
+
+    .header .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      background: #1a2740;
+      border: 1px solid #2a4070;
+      border-radius: 20px;
+      padding: .25rem .85rem;
+      font-size: .65rem;
+      color: var(--accent);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+    .header .badge .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 2s infinite;
+    }
+
+    .header h1 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.65rem;
+      color: var(--text);
+      line-height: 1.15;
+      letter-spacing: -.02em;
+    }
+    .header h1 span { color: var(--accent); }
+
+    .header p {
+      margin-top: .5rem;
+      font-size: .72rem;
+      color: var(--muted);
+      letter-spacing: .04em;
+    }
+
+    /* ── Section labels ── */
+    .section-label {
+      font-size: .6rem;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 1.4rem 0 .75rem;
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── Field group ── */
+    .field { margin-bottom: .85rem; }
+
+    .field label {
+      display: block;
+      font-size: .65rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: .4rem;
+    }
+
+    .field input {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: .72rem 1rem;
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: .88rem;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s, background .2s;
+    }
+    .field input::placeholder { color: #3a4555; }
+
+    .field input:focus {
+      border-color: var(--accent);
+      background: #131822;
+      box-shadow: 0 0 0 3px #2a7cff1a, inset 0 1px 0 #ffffff08;
+    }
+    .field input:hover:not(:focus) {
+      border-color: #2a3545;
+    }
+
+    /* subject grid */
+    .subjects-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .75rem;
+    }
+    .subjects-grid .field:last-child:nth-child(odd) {
+      grid-column: span 2;
+    }
+
+    .field .hint {
+      font-size: .6rem;
+      color: var(--muted);
+      margin-top: .3rem;
+      display: block;
+    }
+
+    /* ── Buttons ── */
+    .btn-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .75rem;
+      margin-top: 1.6rem;
+    }
+
+    .btn {
+      border: none;
+      border-radius: var(--radius);
+      padding: .82rem 1rem;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: .82rem;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: transform .15s, box-shadow .2s, background .2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: #ffffff10;
+      opacity: 0;
+      transition: opacity .2s;
+    }
+    .btn:hover::after { opacity: 1; }
+    .btn:active { transform: scale(.97); }
+
+    .btn-calc {
+      background: linear-gradient(135deg, #1a5fff, #0d3fc4);
+      color: #fff;
+      box-shadow: 0 4px 20px #2a7cff30;
+    }
+    .btn-calc:hover { box-shadow: 0 6px 28px #2a7cff50; }
+
+    .btn-reset {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    .btn-reset:hover { border-color: #3a4a60; color: var(--text); }
+
+    /* ── Result card ── */
+    .result-wrap {
+      margin-top: 1.5rem;
+      display: none;
+      animation: slideUp .35s cubic-bezier(.16,1,.3,1);
+    }
+    .result-wrap.visible { display: block; }
+
+    .result-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .result-header {
+      background: linear-gradient(90deg, #11192a, #0e1620);
+      padding: .9rem 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .result-header .r-icon {
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      background: #1a2a44;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .9rem;
+    }
+    .result-header h3 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: .85rem;
+      color: var(--text);
+      letter-spacing: .04em;
+    }
+
+    .result-body { padding: 1.1rem 1.2rem; }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: .75rem;
+      margin-bottom: 1.1rem;
+    }
+
+    .stat {
+      background: #0f141d;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: .8rem .6rem;
+      text-align: center;
+    }
+    .stat .s-label {
+      font-size: .58rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: .35rem;
+      display: block;
+    }
+    .stat .s-value {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: var(--text);
+    }
+
+    /* Grade badge */
+    .grade-display {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: #0f141d;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: .9rem 1.1rem;
+    }
+
+    .grade-circle {
+      width: 54px; height: 54px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+      transition: all .3s;
+    }
+
+    .grade-info .g-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: .95rem;
+      color: var(--text);
+    }
+    .grade-info .g-desc {
+      font-size: .68rem;
+      color: var(--muted);
+      margin-top: .2rem;
+    }
+    .grade-info .g-student {
+      font-size: .7rem;
+      color: var(--accent2);
+      margin-top: .3rem;
+      opacity: .8;
+    }
+
+    /* grade colour variants */
+    .grade-ap { background: #0e2a1a; border: 2px solid #00e5c3; color: #00e5c3; }
+    .grade-a  { background: #0d2a1f; border: 2px solid #00cc9a; color: #00cc9a; }
+    .grade-b  { background: #102040; border: 2px solid #2a7cff; color: #2a7cff; }
+    .grade-c  { background: #1e2010; border: 2px solid #d4c030; color: #d4c030; }
+    .grade-d  { background: #201a0a; border: 2px solid #ffb830; color: #ffb830; }
+    .grade-f  { background: #2a0f12; border: 2px solid #ff4d6a; color: #ff4d6a; }
+
+    /* ── Error state ── */
+    .field input.error { border-color: var(--danger); box-shadow: 0 0 0 3px #ff4d6a18; }
+    .error-msg { font-size: .62rem; color: var(--danger); margin-top: .3rem; display: none; }
+    .error-msg.show { display: block; }
+
+    /* ── Animations ── */
+    @keyframes pulse {
+      0%,100% { opacity: 1; }
+      50% { opacity: .35; }
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 480px) {
+      .card { padding: 1.8rem 1.3rem; }
+      .stats-row { grid-template-columns: repeat(3,1fr); gap: .5rem; }
+      .stat .s-value { font-size: .95rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+
+  <div class="header">
+    <div class="badge"><span class="dot"></span>Academic Tool</div>
+    <h1>Grade <span>Calculator</span></h1>
+    <p>Enter marks to compute results instantly</p>
+  </div>
+
+  <!-- Student Info -->
+  <div class="section-label">Student Info</div>
+
+  <div class="field">
+    <label>Student Name</label>
+    <input type="text" id="studentName" placeholder="e.g. Arjun Sharma" autocomplete="off"/>
+    <span class="error-msg" id="nameErr">Please enter student name.</span>
+  </div>
+
+  <div class="field">
+    <label>Roll Number</label>
+    <input type="text" id="rollNo" placeholder="e.g. 2024CS042" autocomplete="off"/>
+    <span class="error-msg" id="rollErr">Please enter roll number.</span>
+  </div>
+
+  <!-- Subjects -->
+  <div class="section-label">Subject Marks <span style="color:#3a4a60;font-size:.55rem"> / 100 each</span></div>
+
+  <div class="subjects-grid">
+    <div class="field">
+      <label>Subject 1</label>
+      <input type="number" id="s1" placeholder="0 – 100" min="0" max="100"/>
+      <span class="error-msg" id="s1Err">0–100 only.</span>
+    </div>
+    <div class="field">
+      <label>Subject 2</label>
+      <input type="number" id="s2" placeholder="0 – 100" min="0" max="100"/>
+      <span class="error-msg" id="s2Err">0–100 only.</span>
+    </div>
+    <div class="field">
+      <label>Subject 3</label>
+      <input type="number" id="s3" placeholder="0 – 100" min="0" max="100"/>
+      <span class="error-msg" id="s3Err">0–100 only.</span>
+    </div>
+    <div class="field">
+      <label>Subject 4</label>
+      <input type="number" id="s4" placeholder="0 – 100" min="0" max="100"/>
+      <span class="error-msg" id="s4Err">0–100 only.</span>
+    </div>
+    <div class="field">
+      <label>Subject 5</label>
+      <input type="number" id="s5" placeholder="0 – 100" min="0" max="100"/>
+      <span class="error-msg" id="s5Err">0–100 only.</span>
+    </div>
+  </div>
+
+  <!-- Buttons -->
+  <div class="btn-row">
+    <button class="btn btn-calc" onclick="calculate()">⚡ Calculate</button>
+    <button class="btn btn-reset" onclick="resetForm()">↺ Reset</button>
+  </div>
+
+  <!-- Result -->
+  <div class="result-wrap" id="resultWrap">
+    <div class="result-card">
+      <div class="result-header">
+        <span class="r-icon">📊</span>
+        <h3>Result Summary</h3>
+      </div>
+      <div class="result-body">
+        <div class="stats-row">
+          <div class="stat">
+            <span class="s-label">Total</span>
+            <span class="s-value" id="rTotal">—</span>
+          </div>
+          <div class="stat">
+            <span class="s-label">Percentage</span>
+            <span class="s-value" id="rPercent">—</span>
+          </div>
+          <div class="stat">
+            <span class="s-label">Max</span>
+            <span class="s-value">500</span>
+          </div>
+        </div>
+
+        <div class="grade-display">
+          <div class="grade-circle" id="gradeCircle">—</div>
+          <div class="grade-info">
+            <div class="g-title" id="gradeTitle">—</div>
+            <div class="g-desc" id="gradeDesc">—</div>
+            <div class="g-student" id="gradeStudent">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const fields = [
+    { id: 'studentName', errId: 'nameErr', type: 'text' },
+    { id: 'rollNo',      errId: 'rollErr', type: 'text' },
+    { id: 's1', errId: 's1Err', type: 'num' },
+    { id: 's2', errId: 's2Err', type: 'num' },
+    { id: 's3', errId: 's3Err', type: 'num' },
+    { id: 's4', errId: 's4Err', type: 'num' },
+    { id: 's5', errId: 's5Err', type: 'num' },
+  ];
+
+  function getGradeData(pct) {
+    if (pct >= 90) return { grade:'A+', title:'Outstanding',  desc:'Exceptional performance', cls:'grade-ap' };
+    if (pct >= 80) return { grade:'A',  title:'Excellent',    desc:'Excellent command of subjects', cls:'grade-a' };
+    if (pct >= 70) return { grade:'B',  title:'Good',         desc:'Good understanding demonstrated', cls:'grade-b' };
+    if (pct >= 60) return { grade:'C',  title:'Average',      desc:'Average performance', cls:'grade-c' };
+    if (pct >= 50) return { grade:'D',  title:'Below Average',desc:'Needs improvement', cls:'grade-d' };
+    return           { grade:'F',  title:'Fail',          desc:'Did not meet pass criteria', cls:'grade-f' };
+  }
+
+  function clearErrors() {
+    fields.forEach(f => {
+      document.getElementById(f.id).classList.remove('error');
+      document.getElementById(f.errId).classList.remove('show');
+    });
+  }
+
+  function validate() {
+    let ok = true;
+
+    // text fields
+    ['studentName','rollNo'].forEach((id, i) => {
+      const el = document.getElementById(id);
+      const errEl = document.getElementById(fields[i].errId);
+      if (!el.value.trim()) {
+        el.classList.add('error'); errEl.classList.add('show'); ok = false;
+      }
+    });
+
+    // numeric fields
+    ['s1','s2','s3','s4','s5'].forEach((id, i) => {
+      const el = document.getElementById(id);
+      const errEl = document.getElementById(fields[i+2].errId);
+      const v = el.value.trim();
+      if (v === '' || isNaN(v) || +v < 0 || +v > 100) {
+        el.classList.add('error'); errEl.classList.add('show'); ok = false;
+      }
+    });
+
+    return ok;
+  }
+
+  function calculate() {
+    clearErrors();
+    if (!validate()) return;
+
+    const marks = ['s1','s2','s3','s4','s5'].map(id => +document.getElementById(id).value);
+    const total  = marks.reduce((a,b) => a+b, 0);
+    const pct    = (total / 500) * 100;
+    const data   = getGradeData(pct);
+    const name   = document.getElementById('studentName').value.trim();
+
+    document.getElementById('rTotal').textContent   = total;
+    document.getElementById('rPercent').textContent = pct.toFixed(1) + '%';
+
+    const circle = document.getElementById('gradeCircle');
+    circle.textContent = data.grade;
+    circle.className   = 'grade-circle ' + data.cls;
+
+    document.getElementById('gradeTitle').textContent   = data.title;
+    document.getElementById('gradeDesc').textContent    = data.desc;
+    document.getElementById('gradeStudent').textContent = '→ ' + name;
+
+    const wrap = document.getElementById('resultWrap');
+    wrap.classList.remove('visible');
+    void wrap.offsetWidth; // reflow to restart animation
+    wrap.classList.add('visible');
+    wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function resetForm() {
+    fields.forEach(f => {
+      document.getElementById(f.id).value = '';
+      document.getElementById(f.id).classList.remove('error');
+      document.getElementById(f.errId).classList.remove('show');
+    });
+    document.getElementById('resultWrap').classList.remove('visible');
+    document.getElementById('studentName').focus();
+  }
+
+  // live clear error on input
+  fields.forEach(f => {
+    document.getElementById(f.id).addEventListener('input', function() {
+      this.classList.remove('error');
+      document.getElementById(f.errId).classList.remove('show');
+    });
+  });
+
+  // Enter key triggers calculate
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') calculate();
+  });
+</script>
+</body>
+</html>
